@@ -38,6 +38,7 @@ const schema = z.object({
   nome: z.string().min(3, "Mínimo 3 caracteres"),
   cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido"),
   interesses: z.array(z.string()).min(1, "Selecione ao menos 1 jogo"),
+  senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
 const JOGOS_FURIA = ["CS:GO", "Valorant", "LoL", "Free Fire", "Rainbow Six"];
@@ -72,18 +73,18 @@ export default function RegisterForm() {
     setError(null);
 
     try {
-      // Corrigindo a definição de payload
       const payload = {
         nome: data.nome,
-        cpf: data.cpf.replace(/\D/g, ""), // Remove formatação do CPF
+        cpf: data.cpf.replace(/\D/g, ""),
         interesses: data.interesses,
+        senha: data.senha,
       };
 
-      console.log("Enviando dados:", payload); // Para debug
+      console.log("Enviando dados:", payload);
 
       const response = await api.post("/users", payload);
 
-      console.log("Resposta do servidor:", response.data); // Para debug
+      console.log("Resposta do servidor:", response.data);
 
       setSuccess(true);
       reset();
@@ -148,6 +149,23 @@ export default function RegisterForm() {
         {...register("nome")}
         error={!!errors.nome}
         helperText={errors.nome?.message}
+      />
+
+      <TextField
+        label="Senha"
+        type="password"
+        fullWidth
+        disabled={loading}
+        sx={{
+          mb: 3,
+          "& label": { color: "#fff" },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": { borderColor: "#ED1C24" },
+          },
+        }}
+        {...register("senha")}
+        error={!!errors.senha}
+        helperText={errors.senha?.message}
       />
 
       <TextField

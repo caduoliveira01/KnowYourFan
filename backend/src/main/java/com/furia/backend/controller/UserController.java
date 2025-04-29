@@ -1,7 +1,6 @@
 package com.furia.backend.controller;
 
 import com.furia.backend.model.User;
-import com.furia.backend.repository.UserRepository;
 import com.furia.backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

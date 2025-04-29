@@ -3,11 +3,13 @@ package com.furia.backend.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Table(name = "app_users")  // Mudar o nome da tabela
+@Table(name = "app_users")
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,35 +27,6 @@ public class User {
     @Column(name = "interest")
     private List<String> interesses;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public List<String> getInteresses() {
-        return interesses;
-    }
-
-    public void setInteresses(List<String> interesses) {
-        this.interesses = interesses;
-    }
+    @NotBlank
+    private String senha;
 }

@@ -3,7 +3,6 @@ package com.furia.backend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,16 +33,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/h2-console/**",  // Libera o console do H2
-                                "/api/**"          // Libera seus endpoints API
+                                "/h2-console/**",
+                                "/api/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
-                        .frameOptions().disable() // Necessário para o H2 Console
+                        .frameOptions().disable()
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/**") // Desativa CSRF para esses paths
+                        .ignoringRequestMatchers("/h2-console/**", "/api/**")
                 );
 
         return http.build();

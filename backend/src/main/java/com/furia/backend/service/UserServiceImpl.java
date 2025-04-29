@@ -4,6 +4,7 @@ import com.furia.backend.model.User;
 import com.furia.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -11,16 +12,17 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
     @Transactional
     public User saveUser(User user) {
-        // Formata CPF se necessário
         if (user.getCpf() != null) {
             String rawCpf = user.getCpf().replaceAll("[^0-9]", "");
             if (!rawCpf.matches("\\d{11}")) {
@@ -29,7 +31,6 @@ public class UserServiceImpl implements UserService {
             user.setCpf(rawCpf.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4"));
         }
 
-        // Validações
         if (userRepository.existsByCpf(user.getCpf())) {
             throw new IllegalArgumentException("CPF já cadastrado");
         }
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService {
         if (user.getInteresses() == null || user.getInteresses().isEmpty()) {
             throw new IllegalArgumentException("Deve haver pelo menos 1 interesse");
         }
+
+        String senhaCriptografada = passwordEncoder.encode(user.getSenha());
+        user.setSenha(senhaCriptografada);
 
         return userRepository.save(user);
     }
