@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import {
   TextField,
   Button,
@@ -11,34 +11,42 @@ import { useForm } from "react-hook-form";
 import { IMaskInput } from "react-imask";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { forwardRef } from "react";
 import api from "../services/api";
-import { registerUser } from "../services/api";
 
-const CPFInput = forwardRef((props, ref) => {
+const CPFInput = forwardRef(function CPFInput(props, ref) {
   return (
     <IMaskInput
       {...props}
       mask="000.000.000-00"
       inputRef={ref}
-      definitions={{
-        0: /[0-9]/,
-      }}
+      definitions={{ 0: /[0-9]/ }}
       overwrite
     />
   );
 });
 
-api.interceptors.request.use((config) => {
-  console.log("Request Headers:", config.headers);
-  return config;
+const CEPInput = forwardRef(function CEPInput(props, ref) {
+  return (
+    <IMaskInput
+      {...props}
+      mask="00000-000"
+      inputRef={ref}
+      definitions={{ 0: /[0-9]/ }}
+      overwrite
+    />
+  );
 });
 
 const schema = z.object({
   nome: z.string().min(3, "Mínimo 3 caracteres"),
   cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido"),
-  interesses: z.array(z.string()).min(1, "Selecione ao menos 1 jogo"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  interesses: z.array(z.string()).min(1, "Selecione ao menos 1 jogo"),
+  enderecoRua: z.string().min(3, "Rua obrigatória"),
+  enderecoCidade: z.string().min(2, "Cidade obrigatória"),
+  enderecoEstado: z.string().min(2, "Estado obrigatório"),
+  enderecoCep: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido"),
+  atividadesEventos: z.string().optional(),
 });
 
 const JOGOS_FURIA = ["CS:GO", "Valorant", "LoL", "Free Fire", "Rainbow Six"];
@@ -62,10 +70,10 @@ export default function RegisterForm() {
   const interesses = watch("interesses") || [];
 
   const toggleInteresse = (jogo) => {
-    const newInteresses = interesses.includes(jogo)
+    const novos = interesses.includes(jogo)
       ? interesses.filter((i) => i !== jogo)
       : [...interesses, jogo];
-    setValue("interesses", newInteresses);
+    setValue("interesses", novos);
   };
 
   const onSubmit = async (data) => {
@@ -76,21 +84,21 @@ export default function RegisterForm() {
       const payload = {
         nome: data.nome,
         cpf: data.cpf.replace(/\D/g, ""),
-        interesses: data.interesses,
         senha: data.senha,
+        interesses: data.interesses,
+        enderecoRua: data.enderecoRua,
+        enderecoCidade: data.enderecoCidade,
+        enderecoEstado: data.enderecoEstado,
+        enderecoCep: data.enderecoCep,
+        atividadesEventos: data.atividadesEventos || "",
       };
 
-      console.log("Enviando dados:", payload);
-
       const response = await api.post("/users", payload);
-
-      console.log("Resposta do servidor:", response.data);
 
       setSuccess(true);
       reset();
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("Erro na requisição:", err);
       setError(
         err.response?.data?.message ||
           err.message ||
@@ -128,7 +136,6 @@ export default function RegisterForm() {
           ⚠️ {error}
         </Typography>
       )}
-
       {success && (
         <Typography color="#4CAF50" mb={2} fontFamily="Rajdhani">
           ✔️ Cadastro realizado com sucesso!
@@ -136,16 +143,10 @@ export default function RegisterForm() {
       )}
 
       <TextField
-        label="Nome Completo"
+        label="Nome"
         fullWidth
+        sx={style}
         disabled={loading}
-        sx={{
-          mb: 3,
-          "& label": { color: "#fff" },
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "#ED1C24" },
-          },
-        }}
         {...register("nome")}
         error={!!errors.nome}
         helperText={errors.nome?.message}
@@ -155,14 +156,8 @@ export default function RegisterForm() {
         label="Senha"
         type="password"
         fullWidth
+        sx={style}
         disabled={loading}
-        sx={{
-          mb: 3,
-          "& label": { color: "#fff" },
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "#ED1C24" },
-          },
-        }}
         {...register("senha")}
         error={!!errors.senha}
         helperText={errors.senha?.message}
@@ -171,23 +166,15 @@ export default function RegisterForm() {
       <TextField
         label="CPF"
         fullWidth
+        sx={style}
         disabled={loading}
-        InputProps={{
-          inputComponent: CPFInput,
-        }}
-        sx={{
-          mb: 3,
-          "& label": { color: "#fff" },
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "#ED1C24" },
-          },
-        }}
+        InputProps={{ inputComponent: CPFInput }}
         {...register("cpf")}
         error={!!errors.cpf}
         helperText={errors.cpf?.message}
       />
 
-      <Typography variant="body1" color="#fff" mb={2} fontFamily="Rajdhani">
+      <Typography variant="body1" color="#fff" mb={1} fontFamily="Rajdhani">
         Seus interesses:
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
@@ -214,20 +201,55 @@ export default function RegisterForm() {
         </Typography>
       )}
 
-      <Button
-        type="submit"
+      <TextField
+        label="Rua"
         fullWidth
+        sx={style}
         disabled={loading}
-        sx={{
-          bgcolor: "#ED1C24",
-          color: "#000",
-          py: 2,
-          fontFamily: "Rajdhani",
-          fontWeight: 700,
-          "&:hover": { bgcolor: "#FF5E62" },
-          "&:disabled": { bgcolor: "#2E2E2E" },
-        }}
-      >
+        {...register("enderecoRua")}
+        error={!!errors.enderecoRua}
+        helperText={errors.enderecoRua?.message}
+      />
+      <TextField
+        label="Cidade"
+        fullWidth
+        sx={style}
+        disabled={loading}
+        {...register("enderecoCidade")}
+        error={!!errors.enderecoCidade}
+        helperText={errors.enderecoCidade?.message}
+      />
+      <TextField
+        label="Estado"
+        fullWidth
+        sx={style}
+        disabled={loading}
+        {...register("enderecoEstado")}
+        error={!!errors.enderecoEstado}
+        helperText={errors.enderecoEstado?.message}
+      />
+      <TextField
+        label="CEP"
+        fullWidth
+        sx={style}
+        disabled={loading}
+        InputProps={{ inputComponent: CEPInput }}
+        {...register("enderecoCep")}
+        error={!!errors.enderecoCep}
+        helperText={errors.enderecoCep?.message}
+      />
+
+      <TextField
+        label="Atividades/Eventos"
+        fullWidth
+        sx={style}
+        disabled={loading}
+        {...register("atividadesEventos")}
+        error={!!errors.atividadesEventos}
+        helperText={errors.atividadesEventos?.message}
+      />
+
+      <Button type="submit" fullWidth disabled={loading} sx={buttonStyle}>
         {loading ? (
           <CircularProgress size={24} sx={{ color: "#ED1C24" }} />
         ) : (
@@ -237,3 +259,21 @@ export default function RegisterForm() {
     </Box>
   );
 }
+
+const style = {
+  mb: 3,
+  "& label": { color: "#fff" },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#ED1C24" },
+  },
+};
+
+const buttonStyle = {
+  bgcolor: "#ED1C24",
+  color: "#000",
+  py: 2,
+  fontFamily: "Rajdhani",
+  fontWeight: 700,
+  "&:hover": { bgcolor: "#FF5E62" },
+  "&:disabled": { bgcolor: "#2E2E2E" },
+};

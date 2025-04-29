@@ -24,6 +24,5 @@ api.interceptors.response.use(
   }
 );
 
-// Exporte tanto a instância quanto a função específica
 export const registerUser = (userData) => api.post("/users", userData);
 export default api;
