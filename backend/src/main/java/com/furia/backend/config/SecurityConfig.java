@@ -2,49 +2,50 @@ package com.furia.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setExposedHeaders(List.of("Authorization"));
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults()) // <-- Ativa CORS
+                .csrf(csrf -> csrf.disable())    // Desativa CSRF (para testes e APIs públicas)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/h2-console/**",
-                                "/api/**"
-                        ).permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .headers(AbstractHttpConfigurer::disable
-                )
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/**")
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5173")); // <-- frontend URL
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

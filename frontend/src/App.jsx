@@ -4,6 +4,8 @@ import Home from "./pages/Home/Home";
 import Profile from "./pages/Profile/Profile";
 import Register from "./pages/Register/Register";
 import { Box } from "@mui/material";
+import Login from "./pages/Login/Login";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -21,7 +23,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Box>
     </Box>

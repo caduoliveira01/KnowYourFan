@@ -4,35 +4,70 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "app_users")
 @Data
-public class User {
+@Table(name = "usuarios")
+public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome é obrigatório")
     private String nome;
-
-    @Column(unique = true)
-    @Pattern(regexp = "(\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}|\\d{11})", message = "CPF inválido")
-    private String cpf;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "interest")
-    private List<String> interesses;
-    
-    private String enderecoRua;
-    private String enderecoCidade;
-    private String enderecoEstado;
-    private String enderecoCep;
-    private String atividadesEventos;
-
-    @NotBlank
+    private String email;
     private String senha;
+    private String cpf;
+    private String endereco;
+
+    @ElementCollection
+    private List<String> interesses;
+
+    @ElementCollection
+    private List<String> eventos;
+
+    @ElementCollection
+    private List<String> atividades;
+
+    @ElementCollection
+    private List<String> compras;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

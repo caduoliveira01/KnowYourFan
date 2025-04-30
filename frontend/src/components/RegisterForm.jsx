@@ -39,6 +39,7 @@ const CEPInput = forwardRef(function CEPInput(props, ref) {
 
 const schema = z.object({
   nome: z.string().min(3, "Mínimo 3 caracteres"),
+  email: z.string().email("Email inválido"),
   cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
   interesses: z.array(z.string()).min(1, "Selecione ao menos 1 jogo"),
@@ -81,19 +82,22 @@ export default function RegisterForm() {
     setError(null);
 
     try {
+      // Concatenando todos os dados de endereço em uma string
+      const enderecoCompleto = `${data.enderecoRua}, ${data.enderecoCidade} - ${data.enderecoEstado}, ${data.enderecoCep}`;
+
       const payload = {
         nome: data.nome,
+        email: data.email,
         cpf: data.cpf.replace(/\D/g, ""),
         senha: data.senha,
         interesses: data.interesses,
-        enderecoRua: data.enderecoRua,
-        enderecoCidade: data.enderecoCidade,
-        enderecoEstado: data.enderecoEstado,
-        enderecoCep: data.enderecoCep,
-        atividadesEventos: data.atividadesEventos || "",
+        endereco: enderecoCompleto, // Passando o endereço completo como uma string
+        atividades: data.atividadesEventos ? [data.atividadesEventos] : [],
+        eventos: [],
+        compras: [],
       };
 
-      const response = await api.post("/users", payload);
+      const response = await api.post("/auth", payload);
 
       setSuccess(true);
       reset();
@@ -150,6 +154,17 @@ export default function RegisterForm() {
         {...register("nome")}
         error={!!errors.nome}
         helperText={errors.nome?.message}
+      />
+
+      <TextField
+        label="Email"
+        type="email"
+        fullWidth
+        sx={style}
+        disabled={loading}
+        {...register("email")}
+        error={!!errors.email}
+        helperText={errors.email?.message}
       />
 
       <TextField
@@ -210,6 +225,7 @@ export default function RegisterForm() {
         error={!!errors.enderecoRua}
         helperText={errors.enderecoRua?.message}
       />
+
       <TextField
         label="Cidade"
         fullWidth
@@ -219,6 +235,7 @@ export default function RegisterForm() {
         error={!!errors.enderecoCidade}
         helperText={errors.enderecoCidade?.message}
       />
+
       <TextField
         label="Estado"
         fullWidth
@@ -228,6 +245,7 @@ export default function RegisterForm() {
         error={!!errors.enderecoEstado}
         helperText={errors.enderecoEstado?.message}
       />
+
       <TextField
         label="CEP"
         fullWidth
