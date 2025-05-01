@@ -45,9 +45,12 @@ export default function Header() {
           <Button component={Link} to="/" sx={buttonStyle}>
             HOME
           </Button>
-          <Button component={Link} to="/register" sx={buttonStyle}>
-            REGISTER
-          </Button>
+
+          {!isAuthenticated && (
+            <Button component={Link} to="/register" sx={buttonStyle}>
+              REGISTER
+            </Button>
+          )}
 
           {isAuthenticated ? (
             <>
