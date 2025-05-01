@@ -60,6 +60,7 @@ const Profile = () => {
           fontSize: "24px",
           fontWeight: "bold",
           marginBottom: "10px",
+          color: "#555",
         }}
       >
         Olá, {user.nome}
