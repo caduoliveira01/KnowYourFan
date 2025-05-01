@@ -1,8 +1,8 @@
 import axios from "axios";
+import authService from "./authService";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
-  withCredentials: false,
+  baseURL: "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -10,6 +10,12 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   console.log("Enviando requisição:", config);
+
+  const token = authService.getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 
@@ -24,5 +30,4 @@ api.interceptors.response.use(
   }
 );
 
-export const registerUser = (userData) => api.post("/auth", userData);
 export default api;

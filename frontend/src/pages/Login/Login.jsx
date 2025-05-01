@@ -1,8 +1,22 @@
 import React, { useState } from "react";
-import { Button, TextField, Box, Typography, Container } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Box,
+  Typography,
+  Container,
+  Divider,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/system";
 import authService from "../../services/authService";
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  getAuth,
+} from "firebase/auth";
+import { app } from "../../services/firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +25,8 @@ const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const auth = getAuth(app);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -18,6 +34,20 @@ const Login = () => {
       navigate("/profile");
     } catch (err) {
       setError("Credenciais inválidas ou erro de comunicação.");
+    }
+  };
+
+  const handleSocialLogin = async (providerType) => {
+    const provider =
+      providerType === "google"
+        ? new GoogleAuthProvider()
+        : new FacebookAuthProvider();
+
+    try {
+      await signInWithPopup(auth, provider);
+      navigate("/profile");
+    } catch (err) {
+      setError("Erro ao autenticar com " + providerType);
     }
   };
 
@@ -44,10 +74,7 @@ const Login = () => {
         <img
           src="/images/furia-logo.png"
           alt="FURIA Esports"
-          style={{
-            width: "150px",
-            marginBottom: "20px",
-          }}
+          style={{ width: "150px", marginBottom: "20px" }}
         />
         <Typography
           variant="h4"
@@ -82,13 +109,7 @@ const Login = () => {
             sx={{ mb: 3 }}
           />
           {error && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "red",
-                marginBottom: 2,
-              }}
-            >
+            <Typography variant="body2" sx={{ color: "red", mb: 2 }}>
               {error}
             </Typography>
           )}
@@ -100,8 +121,8 @@ const Login = () => {
               background: "linear-gradient(90deg, #ED1C24, #FF5E62)",
               color: "#fff",
               fontWeight: 700,
-              letterSpacing: 1,
               padding: "10px 0",
+              mb: 2,
               "&:hover": {
                 background: "linear-gradient(90deg, #FF5E62, #ED1C24)",
               },
@@ -110,6 +131,26 @@ const Login = () => {
             Entrar
           </Button>
         </form>
+
+        <Divider sx={{ my: 3, borderColor: "#333" }}>ou</Divider>
+
+        <Button
+          onClick={() => handleSocialLogin("google")}
+          fullWidth
+          variant="outlined"
+          sx={{
+            color: "#fff",
+            borderColor: "#ED1C24",
+            mb: 2,
+            "&:hover": {
+              backgroundColor: "#ED1C24",
+              color: "#000",
+              borderColor: "#ED1C24",
+            },
+          }}
+        >
+          Entrar com Google
+        </Button>
       </Container>
     </Box>
   );

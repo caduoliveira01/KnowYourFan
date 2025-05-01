@@ -1,8 +1,6 @@
 package com.furia.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +33,9 @@ public class User implements UserDetails{
 
     @ElementCollection
     private List<String> compras;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Documento> documentos;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

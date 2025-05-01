@@ -1,4 +1,5 @@
 import { Typography, Box } from "@mui/material";
+import FeedFuria from "../../components/FeedFuria";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
         maxWidth: { md: "800px" },
         mx: "auto",
         py: 8,
+        color: "#fff",
       }}
     >
       <Typography
@@ -36,6 +38,8 @@ export default function Home() {
       >
         Seu hub de conexão com a FURIA
       </Typography>
+
+      <FeedFuria />
     </Box>
   );
 }

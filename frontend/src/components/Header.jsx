@@ -1,5 +1,5 @@
 import { AppBar, Toolbar, Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const buttonStyle = {
@@ -12,6 +12,16 @@ export default function Header() {
       transform: "scale(1.05)",
     },
   };
+
+  const isAuthenticated = localStorage.getItem("token");
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <AppBar position="static" sx={{ bgcolor: "#000" }}>
       <Toolbar
@@ -38,9 +48,21 @@ export default function Header() {
           <Button component={Link} to="/register" sx={buttonStyle}>
             REGISTER
           </Button>
-          <Button component={Link} to="/profile" sx={buttonStyle}>
-            PROFILE
-          </Button>
+
+          {isAuthenticated ? (
+            <>
+              <Button component={Link} to="/profile" sx={buttonStyle}>
+                PROFILE
+              </Button>
+              <Button onClick={handleLogout} sx={buttonStyle}>
+                LOGOUT
+              </Button>
+            </>
+          ) : (
+            <Button component={Link} to="/login" sx={buttonStyle}>
+              LOGIN
+            </Button>
+          )}
         </Box>
 
         <Box sx={{ width: { xs: 0, md: 40 } }} />

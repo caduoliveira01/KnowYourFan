@@ -82,7 +82,6 @@ export default function RegisterForm() {
     setError(null);
 
     try {
-      // Concatenando todos os dados de endereço em uma string
       const enderecoCompleto = `${data.enderecoRua}, ${data.enderecoCidade} - ${data.enderecoEstado}, ${data.enderecoCep}`;
 
       const payload = {
@@ -91,7 +90,7 @@ export default function RegisterForm() {
         cpf: data.cpf.replace(/\D/g, ""),
         senha: data.senha,
         interesses: data.interesses,
-        endereco: enderecoCompleto, // Passando o endereço completo como uma string
+        endereco: enderecoCompleto,
         atividades: data.atividadesEventos ? [data.atividadesEventos] : [],
         eventos: [],
         compras: [],

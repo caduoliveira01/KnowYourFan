@@ -3,14 +3,15 @@ import axios from "axios";
 const API_URL = "http://localhost:8080/auth";
 
 const login = async (email, senha) => {
-  const response = await axios.post(`${API_URL}/login`, {
-    email,
-    senha,
-  });
-
+  const response = await axios.post(`${API_URL}/login`, { email, senha });
   const token = response.data.token;
   localStorage.setItem("token", token);
   return token;
+};
+
+const register = async (userData) => {
+  const response = await axios.post(API_URL, userData);
+  return response.data;
 };
 
 const logout = () => {
@@ -24,18 +25,17 @@ const getToken = () => {
 const isAuthenticated = () => {
   const token = getToken();
   if (!token) return false;
-
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    const now = Math.floor(Date.now() / 1000);
-    return payload.exp > now;
-  } catch (e) {
+    return payload.exp > Math.floor(Date.now() / 1000);
+  } catch {
     return false;
   }
 };
 
 export default {
   login,
+  register,
   logout,
   getToken,
   isAuthenticated,

@@ -6,6 +6,7 @@ import Register from "./pages/Register/Register";
 import { Box } from "@mui/material";
 import Login from "./pages/Login/Login";
 import PrivateRoute from "./components/PrivateRoute";
+import UploadDocumento from "./pages/UploadDocumento/UploadDocumento";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/upload-documento" element={<UploadDocumento />} />
         </Routes>
       </Box>
     </Box>
