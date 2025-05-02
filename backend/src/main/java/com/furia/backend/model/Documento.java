@@ -22,8 +22,8 @@ public class Documento {
 
     private LocalDateTime dataEnvio;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private User usuario;
 
 }

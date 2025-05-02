@@ -8,6 +8,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -32,14 +35,22 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(401).body("Usuário não autenticado");
+            return ResponseEntity.status(401).body(Map.of("error", "Usuário não autenticado"));
         }
 
         return userService.findByEmail(userDetails.getUsername())
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(404).body("Usuário não encontrado"));
+                .map(user -> ResponseEntity.ok(Map.<String, Object>of(
+                        "id", user.getId(),
+                        "nome", user.getNome(),
+                        "email", user.getEmail(),
+                        "cpf", user.getCpf(),
+                        "endereco", user.getEndereco(),
+                        "interesses", user.getInteresses(),
+                        "verificado", user.isValidado()
+                )))
+                .orElse(ResponseEntity.status(404).body(Map.of("error", "Usuário não encontrado")));
     }
 
 }

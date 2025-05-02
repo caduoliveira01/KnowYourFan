@@ -23,8 +23,36 @@ const Profile = () => {
     }
   }, [navigate]);
 
-  const handleVerificarDocumento = () => {
-    navigate("/upload-documento");
+  const handleVerificarDocumento = async () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".txt,.pdf,.doc,.docx";
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await api.post("/documentos/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.data.validado) {
+          setUser((prev) => ({ ...prev, verificado: true }));
+          alert("Documento verificado com sucesso!");
+        } else {
+          alert("Documento não contém seu nome. Verifique e tente novamente.");
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao verificar documento");
+      }
+    };
+
+    fileInput.click();
   };
 
   const handleLogout = () => {

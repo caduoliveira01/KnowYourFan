@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { IMaskInput } from "react-imask";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import api from "../services/api";
+import authService from "../services/authService";
 
 const CPFInput = forwardRef(function CPFInput(props, ref) {
   return (
@@ -96,7 +96,7 @@ export default function RegisterForm() {
         compras: [],
       };
 
-      const response = await api.post("/auth", payload);
+      const response = await authService.register(payload);
 
       setSuccess(true);
       reset();
