@@ -20,6 +20,28 @@ Esta é uma aplicação web sobre o **FURIA Esports**. A aplicação conta com n
 - Tesseract OCR ([Guia de Instalação](https://github.com/tesseract-ocr/tesseract))
 - Conta Firebase ([Configuração](https://firebase.google.com/))
 
+## 📱 Telas do Sistema
+
+<div align="center" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 30px 0;">
+
+### 🏠 Hub Principal
+![Tela Hub](docs/screenshots/hub-screen.png)  
+*Homepage com notícias em destaque*
+
+### 📝 Cadastro
+![Tela de Registro](docs/screenshots/register-screen.png)  
+*Formulário de cadastro de usuários*
+
+### 🔑 Login
+![Tela de Login](docs/screenshots/login-screen.png)  
+*Página de autenticação com opção social*
+
+### 👤 Perfil
+![Tela de Perfil](docs/screenshots/profile-screen.png)  
+*Área do usuário com status de verificação*
+
+</div>
+
 ## Como Acessar o Projeto
 
 ## Rodando localmente 
