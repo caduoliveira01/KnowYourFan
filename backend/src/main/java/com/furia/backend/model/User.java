@@ -18,8 +18,10 @@ public class User implements UserDetails{
     private Long id;
 
     private String nome;
+    @Column(unique = true, nullable = false)
     private String email;
     private String senha;
+    @Column(unique = true, nullable = false)
     private String cpf;
     private String endereco;
 
