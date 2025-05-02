@@ -84,7 +84,6 @@ public class DocumentoController {
 
             documentoRepository.save(doc);
 
-            // 7. Retorna resposta
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "validado", isValid,
